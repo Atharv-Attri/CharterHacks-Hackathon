@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quote
+{% endblock %}
+
+{% block main %}
+    <table style="width:100%">
+        {% for i in stocks %}
+  <tr>
+
+    <th>{{ i["symbol"] }}</th>
+    <th>{{ i["name"] }}</th>
+    <th>{{ i["shares"] }}</th>
+    <th>{{ i["price"] }}</th>
+    <th>{{ i["total"] }}</th>
+
+  </tr>
+  {% endfor %}
+ <tr>
+    <th>CASH</th>
+    <th></th>
+    <th></th>
+    <th></th>
+    <th>{{ cash_money }}</th>
+    </tr>
+    <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th>{{ total_money }}</th>
+    </tr>
+</table>
+{% endblock %}
