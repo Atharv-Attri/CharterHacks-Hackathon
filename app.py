@@ -43,17 +43,17 @@ def index():
     return apology("TODO")
 
 
-@app.route("/buy", methods=["GET", "POST"])
+@app.route("/data", methods=["GET", "POST"])
 @login_required
-def buy():
+def data ():
     
     """Buy shares of stock"""
     return apology("TODO")
 
 
-@app.route("/history")
+@app.route("/input")
 @login_required
-def history():
+def input():
     
     return apology("TODO")
 
@@ -106,7 +106,7 @@ def logout():
     return redirect("/")
 
 
-@app.route("/quote", methods=["GET", "POST"])
+@app.route("/faq", methods=["GET", "POST"])
 @login_required
 def quote():
     """Get stock quote."""

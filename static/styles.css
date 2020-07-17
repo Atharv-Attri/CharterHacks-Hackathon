@@ -1,3 +1,7 @@
+nav {
+    background-color: black;
+    color: white;
+}
 nav .navbar-brand
 {
     /* size for brand */
