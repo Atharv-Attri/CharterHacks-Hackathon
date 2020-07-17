@@ -1,7 +1,7 @@
 import os
 
 from datetime import datetime
-from cs50 import SQL
+from SQL import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
 from tempfile import mkdtemp
@@ -116,7 +116,21 @@ def quote():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
-    return apology("TODO")
+    if request.method == "GET":
+        return render_template("register.html")
+    username = request.form.get("username")
+    password = request.form.get("password")
+    password_c = request.form.get("password_c")
+    username_list = db.execute("Select username FROM users")
+    for i in username_list:
+        if username == i["username"]:
+            return apology("Username Taken", 403)
+
+    if not password == password_c:
+        return apology("Passwords don't match", 403)
+    hashed = generate_password_hash(password,method='pbkdf2:sha256', salt_length=8)
+    db.execute("INSERT INTO users (username, hash) Values (?, ?);", username, hashed)
+    return redirect("/")
 
 
 @app.route("/sell", methods=["GET", "POST"])
