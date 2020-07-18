@@ -47,6 +47,7 @@ def index():
 @login_required
 def data ():
     
+    #return render_template("data.html")
     """Buy shares of stock"""
     return apology("TODO")
 
