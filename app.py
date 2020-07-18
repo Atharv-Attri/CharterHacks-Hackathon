@@ -145,11 +145,16 @@ def register():
     return redirect("/")
 
 
-@app.route("/dashboard", methods=["GET", "POST"])
-@login_required
-def dashboard():
+def infected(id):
+    usr_loc = db.execute("SELECT * FROM location WHERE id = ?", id)
+    inf_p = db.execute("SELECT * FROM users WHERE pos = 1")
+    inf_loc = []
+    for i in inf_p:
+        inf_loc.append([i["lat"], i["long"], i["timedate"].split()])
     
     return apology("SORRY")
+
+
 
 
 def errorhandler(e):
