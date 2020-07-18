@@ -40,24 +40,35 @@ db = SQL("sqlite:///NOTME.db")
 
 
 @app.route("/")
-@login_required
 def index():
-    return render_template("index.html")
+    if not session:
+        return render_template("index.html")
+    return redirect("/dashboard")
 
 
-@app.route("/data", methods=["GET", "POST"])
+@app.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def data ():
-    #return render_template("data.html")
+    username = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])
+    raw = db.execute("SELECT * FROM location WHERE id=?;", session["user_id"])
+    parsed = []
+    for i in raw:
+        lat = i["lat"]
+        lng = i["long"]
+        timedate = i["timedate"].split()
+        date = timedate[0]
+        times = timedate[1]
+        parsed.append({"lat":lat, "long":lng, "date":date, "time":times})
+    return render_template("data.html",username=username[0]["username"], user_data=parsed )
     """Buy shares of stock"""
     return apology("TODO")
 
 
-@app.route("/input")
+@app.route("/positive", methods=["POST"])
 @login_required
-def input():
-
-    return apology("TODO")
+def positive():
+    db.execute("UPDATE users SET pos=1 WHERE id = ?", session["user_id"])
+    return redirect("/dashboard")
 
 
 @app.route("/login", methods=["GET", "POST"])

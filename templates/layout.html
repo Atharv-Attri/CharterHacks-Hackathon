@@ -33,9 +33,11 @@
             <div class="collapse navbar-collapse" id="navbar" >
                 {% if session.user_id %}
                     <ul class="navbar-nav mr-auto mt-2">
-                        <li class="nav-item"><a class="nav-link" style="color:white !important;"href="/data">Data</a></li>
+                        <li class="nav-item"><a class="nav-link" style="color:white !important;"href="/">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" style="color:white !important;"href="/dashboard">Data</a></li>
                         <li class="nav-item"><a class="nav-link" style="color:white !important;"href="/input">Input</a></li>
                         <li class="nav-item"><a class="nav-link" style="color:white !important;"href="/faq">Faq</a></li>
+                    </ul>
                     </ul>
                     <ul class="navbar-nav ml-auto mt-2">
                         <li class="nav-item"><a class="nav-link" style="color:white !important;"href="/logout">Log Out</a></li>
@@ -57,7 +59,7 @@
             </header>
         {% endif %}
 
-        <main class="container p-5">
+        <main class="">
             {% block main %}{% endblock %}
         </main>
         
