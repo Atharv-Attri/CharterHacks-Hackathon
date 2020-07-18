@@ -40,7 +40,7 @@ db = SQL("sqlite:///finance.db")
 @app.route("/")
 @login_required
 def index():
-    return apology("TODO")
+    return render_template("index.html")
 
 
 @app.route("/data", methods=["GET", "POST"])
@@ -106,9 +106,10 @@ def logout():
     return redirect("/")
 
 
-@app.route("/faq", methods=["GET", "POST"])
+@app.route("/faq")
 @login_required
-def quote():
+def faq():
+    return render_template("faq.html")
     """Get stock quote."""
     return apology("SOMETHING WENT WRONG, IDK WHAT", 404)
 
@@ -133,9 +134,9 @@ def register():
     return redirect("/")
 
 
-@app.route("/sell", methods=["GET", "POST"])
+@app.route("/dashboard", methods=["GET", "POST"])
 @login_required
-def sell():
+def dashboard():
     return apology("SORRY")
 
 

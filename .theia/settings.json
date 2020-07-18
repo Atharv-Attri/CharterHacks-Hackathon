@@ -1,3 +1,4 @@
 {
-    "editor.autoSave": "on"
+    "editor.autoSave": "off",
+    "python.pythonPath": "/home/gitpod/.pyenv/versions/3.8.3/bin/python"
 }
