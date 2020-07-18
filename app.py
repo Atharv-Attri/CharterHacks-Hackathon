@@ -7,9 +7,10 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
-
+import datetime, time
 from helpers import apology, login_required
 
+import geocoder
 # Configure application
 app = Flask(__name__)
 
@@ -33,20 +34,21 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///finance.db")
+db = SQL("sqlite:///NOTME.db")
 
 
 
 @app.route("/")
 @login_required
 def index():
+    check()
     return render_template("index.html")
 
 
 @app.route("/data", methods=["GET", "POST"])
 @login_required
 def data ():
-    
+    check()
     #return render_template("data.html")
     """Buy shares of stock"""
     return apology("TODO")
@@ -55,7 +57,7 @@ def data ():
 @app.route("/input")
 @login_required
 def input():
-    
+    check()
     return apology("TODO")
 
 
@@ -110,6 +112,7 @@ def logout():
 @app.route("/faq")
 @login_required
 def faq():
+    check()
     return render_template("faq.html")
     """Get stock quote."""
     return apology("SOMETHING WENT WRONG, IDK WHAT", 404)
@@ -138,6 +141,7 @@ def register():
 @app.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def dashboard():
+    check()
     return apology("SORRY")
 
 
@@ -151,3 +155,19 @@ def errorhandler(e):
 # Listen for errors
 for code in default_exceptions:
     app.errorhandler(code)(errorhandler)
+
+def get_location():
+    g = geocoder.ip('me')
+    current_time = datetime.datetime.now()
+    db.execute("INSERT INTO location (id, lat, long, date, time) Values (:id, :lat, :long, :date, :time);", id=int(session["user_id"]), lat=g.latlng[0], long=float(g.latlng[1]), date=str(datetime.date.today()),time=str(current_time) )
+
+
+current_time = time.time()
+
+def check():
+    global current_time
+    if time.time() - current_time > 5:
+        get_location()
+        current_time = time.time()
+        print("2")
+    else: print("1")
