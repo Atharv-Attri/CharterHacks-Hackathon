@@ -14,6 +14,7 @@ import geocoder
 # Configure application
 app = Flask(__name__)
 
+IP = None
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -41,14 +42,12 @@ db = SQL("sqlite:///NOTME.db")
 @app.route("/")
 @login_required
 def index():
-    check()
     return render_template("index.html")
 
 
 @app.route("/data", methods=["GET", "POST"])
 @login_required
 def data ():
-    check()
     #return render_template("data.html")
     """Buy shares of stock"""
     return apology("TODO")
@@ -57,7 +56,7 @@ def data ():
 @app.route("/input")
 @login_required
 def input():
-    check()
+
     return apology("TODO")
 
 
@@ -67,7 +66,6 @@ def login():
 
     # Forget any user_id
     session.clear()
-
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
@@ -89,7 +87,6 @@ def login():
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
-
         # Redirect user to home page
         return redirect("/")
 
@@ -112,7 +109,6 @@ def logout():
 @app.route("/faq")
 @login_required
 def faq():
-    check()
     return render_template("faq.html")
     """Get stock quote."""
     return apology("SOMETHING WENT WRONG, IDK WHAT", 404)
@@ -141,7 +137,7 @@ def register():
 @app.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def dashboard():
-    check()
+    
     return apology("SORRY")
 
 
@@ -155,19 +151,3 @@ def errorhandler(e):
 # Listen for errors
 for code in default_exceptions:
     app.errorhandler(code)(errorhandler)
-
-def get_location():
-    g = geocoder.ip('me')
-    current_time = datetime.datetime.now()
-    db.execute("INSERT INTO location (id, lat, long, date, time) Values (:id, :lat, :long, :date, :time);", id=int(session["user_id"]), lat=g.latlng[0], long=float(g.latlng[1]), date=str(datetime.date.today()),time=str(current_time) )
-
-
-current_time = time.time()
-
-def check():
-    global current_time
-    if time.time() - current_time > 5:
-        get_location()
-        current_time = time.time()
-        print("2")
-    else: print("1")
