@@ -58,8 +58,11 @@ def data ():
         timedate = i["timedate"].split()
         date = timedate[0]
         times = timedate[1]
-        parsed.append({"lat":lat, "long":lng, "date":date, "time":times})
-    return render_template("data.html",username=username[0]["username"], user_data=parsed )
+        coordinates = i["lat"], i["long"]
+        location = locator.reverse(coordinates)
+        print(location.raw)
+        parsed.append([lat, lng, date, times])
+    return render_template("data.html",username=username[0]["username"], locations=parsed, adds=adds )
     """Buy shares of stock"""
     return apology("TODO")
 
@@ -115,6 +118,29 @@ def logout():
 
     # Redirect user to login form
     return redirect("/")
+
+p1ID = None
+
+@app.route("/chat", methods=["GET", "POST"])
+@login_required
+def chat():
+    if request.method == "GET":
+        if request.form.get("person"):
+            userinf = db.execute("SELECT gov FROM users WHERE id = ?", session["user_id"])
+            if userinf["gov"] == 0:
+                return apology("You do not have permission to start a chat.", 403)
+        texts = db.execute("SELECT * FROM chat WHERE person0= ? AND person1= ?", session["user_id"], request.form.get("person"))
+        person0txt = []
+        person1txt = []
+        for i in texts:
+            if i["sender"] == i["person0"]:
+                person0txt.append(i["text"])
+            else:
+                person1txt.append(i["text"])
+        return render_template("chat.html", p0txt=person0txt, p1txt = person1txt)
+    db.execute("INSERT INTO chat (person0, person1, text, sender) VALUES (:p0, :p1, :txt, :sender)", p0=session["user_id"], p1=request.form.get("person"), txt=request.form.get("text"), sender=session["user_id"])
+    """Get stock quote."""
+    return apology("SOMETHING WENT WRONG, IDK WHAT", 404)
 
 
 @app.route("/faq")

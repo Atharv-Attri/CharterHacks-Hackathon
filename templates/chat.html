@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+
+<form action="/chat" method="post">
+        <input autocomplete="off" autofocus class="form-control" name="text" placeholder="Text" type="text">
+        <button class="btn btn-primary" type="submit">Send</button>
+    </form>
+{% endblock %}
