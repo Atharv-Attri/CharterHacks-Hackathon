@@ -1,3 +1,4 @@
+<!-- Nav bar styles -->
 nav {
     background-color: black;
     color: white;
@@ -106,3 +107,4 @@ tr:nth-child(even) {
     font-size: 3.5rem;
 }
 }
+<!-- The styles for all the code-->

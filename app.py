@@ -1,3 +1,4 @@
+# import libaries
 import os
 
 from datetime import datetime
@@ -10,11 +11,9 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import datetime, time
 from helpers import apology, login_required
 
-import geocoder
 # Configure application
 app = Flask(__name__)
 
-IP = None
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -34,13 +33,14 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-# Configure CS50 Library to use SQLite database
+# Configure SQL Library to use SQLite database
 db = SQL("sqlite:///NOTME.db")
 
 
 
 @app.route("/")
 def index():
+    # if session is not set, return index, else send to dashboard
     if not session:
         return render_template("index.html")
     return redirect("/dashboard")
@@ -49,14 +49,17 @@ def index():
 @app.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def data ():
+    # check for infection
     infected(session["user_id"])
     posd = db.execute("SELECT pos FROM users WHERE id = ?", session["user_id"])
     if posd[0]["pos"] == 0:
         POSITIVE = False
     else:
         POSITIVE = True
+    # get raw data
     raw = db.execute("SELECT * FROM location WHERE id=?;", session["user_id"])
     parsed = []
+    # parse the data
     for i in raw:
         lat = i["lat"]
         lng = i["long"]
@@ -65,9 +68,8 @@ def data ():
         times = timedate[1]
         coordinates = i["lat"], i["long"]
         parsed.append([lat, lng, date, times])
+    # return the template
     return render_template("data.html", locations=parsed, positive=POSITIVE )
-    """Buy shares of stock"""
-    return apology("TODO")
 
 
 @app.route("/positive", methods=["POST"])
@@ -122,36 +124,12 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
-p1ID = None
-
-@app.route("/chat", methods=["GET", "POST"])
-@login_required
-def chat():
-    if request.method == "GET":
-        if request.form.get("person"):
-            userinf = db.execute("SELECT gov FROM users WHERE id = ?", session["user_id"])
-            if userinf["gov"] == 0:
-                return apology("You do not have permission to start a chat.", 403)
-        texts = db.execute("SELECT * FROM chat WHERE person0= ? AND person1= ?", session["user_id"], request.form.get("person"))
-        person0txt = []
-        person1txt = []
-        for i in texts:
-            if i["sender"] == i["person0"]:
-                person0txt.append(i["text"])
-            else:
-                person1txt.append(i["text"])
-        return render_template("chat.html", p0txt=person0txt, p1txt = person1txt)
-    db.execute("INSERT INTO chat (person0, person1, text, sender) VALUES (:p0, :p1, :txt, :sender)", p0=session["user_id"], p1=request.form.get("person"), txt=request.form.get("text"), sender=session["user_id"])
-    """Get stock quote."""
-    return apology("SOMETHING WENT WRONG, IDK WHAT", 404)
-
 
 @app.route("/faq")
 @login_required
 def faq():
     return render_template("faq.html")
-    """Get stock quote."""
-    return apology("SOMETHING WENT WRONG, IDK WHAT", 404)
+    
 
 
 @app.route("/delete", methods=["GET", "POST"])
@@ -163,9 +141,7 @@ def delete():
     timed = request.form.get("time")
     timedate = dated + " " + timed
     db.execute("DELETE FROM location WHERE id = :id AND timedate = :timedate", id=session["user_id"], timedate=timedate)
-    """Get stock quote."""
     return redirect("/")
-    return apology("SOMETHING WENT WRONG, IDK WHAT", 404)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -189,15 +165,16 @@ def register():
 
 
 def infected(id):
+    # get data 
     usr_loc = db.execute("SELECT * FROM location WHERE id = ?", id)
     inf_p = db.execute("SELECT * FROM users WHERE pos = 1")
-    print(inf_p)
     inf_loc = []
     for i in inf_p:
         inf_loc = db.execute("SELECT * FROM location WHERE id= ?", i["id"])
         print(inf_loc)
         for i in inf_loc:
             try:
+                # CHECK
                 sep = i["timedate"].split()
                 inf_loc.append([i["lat"], i["long"], i["timedate"].split()])
                 for y in usr_loc:
@@ -206,7 +183,7 @@ def infected(id):
                         db.execute("UPDATE users SET pos=1 WHERE id = ?", id)
             except:
                 pass
-    return apology("SORRY")
+    return
 
 
 
