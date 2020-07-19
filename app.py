@@ -49,7 +49,12 @@ def index():
 @app.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def data ():
-    username = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])
+    infected(session["user_id"])
+    posd = db.execute("SELECT pos FROM users WHERE id = ?", session["user_id"])
+    if posd[0]["pos"] == 0:
+        POSITIVE = False
+    else:
+        POSITIVE = True
     raw = db.execute("SELECT * FROM location WHERE id=?;", session["user_id"])
     parsed = []
     for i in raw:
@@ -59,10 +64,8 @@ def data ():
         date = timedate[0]
         times = timedate[1]
         coordinates = i["lat"], i["long"]
-        location = locator.reverse(coordinates)
-        print(location.raw)
         parsed.append([lat, lng, date, times])
-    return render_template("data.html",username=username[0]["username"], locations=parsed, adds=adds )
+    return render_template("data.html", locations=parsed, positive=POSITIVE )
     """Buy shares of stock"""
     return apology("TODO")
 
@@ -151,6 +154,20 @@ def faq():
     return apology("SOMETHING WENT WRONG, IDK WHAT", 404)
 
 
+@app.route("/delete", methods=["GET", "POST"])
+@login_required
+def delete():
+    if request.method == "GET":
+        return render_template("delete.html")
+    dated = request.form.get("date")
+    timed = request.form.get("time")
+    timedate = dated + " " + timed
+    db.execute("DELETE FROM location WHERE id = :id AND timedate = :timedate", id=session["user_id"], timedate=timedate)
+    """Get stock quote."""
+    return redirect("/")
+    return apology("SOMETHING WENT WRONG, IDK WHAT", 404)
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
@@ -174,10 +191,21 @@ def register():
 def infected(id):
     usr_loc = db.execute("SELECT * FROM location WHERE id = ?", id)
     inf_p = db.execute("SELECT * FROM users WHERE pos = 1")
+    print(inf_p)
     inf_loc = []
     for i in inf_p:
-        inf_loc.append([i["lat"], i["long"], i["timedate"].split()])
-    
+        inf_loc = db.execute("SELECT * FROM location WHERE id= ?", i["id"])
+        print(inf_loc)
+        for i in inf_loc:
+            try:
+                sep = i["timedate"].split()
+                inf_loc.append([i["lat"], i["long"], i["timedate"].split()])
+                for y in usr_loc:
+                    ysep = y["timedate"].split()
+                    if y["lat"]+0.003 > i["lat"] > y["lat"]-0.003 and  y["long"]+0.003 > i["long"] > y["long"]-0.003 and ysep[0] == sep[0] :
+                        db.execute("UPDATE users SET pos=1 WHERE id = ?", id)
+            except:
+                pass
     return apology("SORRY")
 
 
