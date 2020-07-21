@@ -27,6 +27,7 @@ Dashboard
   <div class="col-md-5 p-lg-5 mx-auto my-5">
     <h1 style="color: black;"  class="display-4 font-weight-normal">YOU ARE IN CONTROL</h1>
     <p  style="color: black;" class="lead font-weight-normal">EVERY PEICE OF DATA WE HAVE ON YOU</p>
+    <p style="color: black;">Your anonymous id is: {{ id }}</p>
     
   </div>
   <div class="product-device shadow-sm d-none d-md-block"></div>
@@ -62,7 +63,7 @@ Dashboard
     <h2 style="color:black;">I WANT TO DELETE MY DATA</h2>
       <form action="/delete" method="post">
         <div class="form-group">
-            <input autocomplete="off" autofocus class="form-control" name="date" placeholder="date" type="text">
+            <input autocomplete="off"  class="form-control" name="date" placeholder="date" type="text">
         </div>
         <div class="form-group">
             <input class="form-control" name="time" placeholder="time" type="text">
@@ -82,6 +83,62 @@ Dashboard
         <h2 class="display-5" style="color: black;">You Are not Infected as far as we know!</h2>
             <p class="lead">We hope you stay safe!</p>
         {% endif %}
+    </div>
+  </div>
+</div>
+<div class="d-md-flex flex-md-equal w-100 my-md-3 pl-md-3">
+  <div class="bg-dark mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden" style="width:200%;" >
+    <div class="my-3 p-3">
+    <h2 >Chat</h2>
+    <h6>If a testing personnel gave you an id to contact, input it here.</h6>
+      <form action="/chat" method="post"> 
+        <div class="form-group">
+            <input autocomplete="off"  class="form-control" name="id" placeholder="ID" type="text">
+        </div>
+        
+
+        <button class="btn btn-primary" type="submit">Go to Chat</button>
+    </form>
+    </div>
+  </div>
+  <div class="bg-white mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center text-white overflow-hidden" style="width:200%;">
+    <div class="my-3 py-3">
+        <!-- if else for if poitive or not-->
+         <h2 style="color:black;" >Don't Track me here</h2>
+         <h4 style="color:black;">You will not be tracked for 0.5 miles from here</h4>
+      <form action="/notTrack" method="post"> 
+         <div class="form-group">
+            <input class="form-control" name="long" placeholder="Longitude" type="text">
+        </div>
+         <div class="form-group">
+            <input class="form-control" name="lat" placeholder="Latitude" type="text">
+        </div>
+
+        <button class="btn btn-primary" type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="d-md-flex flex-md-equal w-100 my-md-3 pl-md-3">
+  <div class="bg-dark mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden" style="width:200%;" >
+    <div class="my-3 p-3">
+    <h2 >I WANT TO ADD DATA</h2>
+      <form action="/locationAdd" method="post"> 
+        <div class="form-group">
+            <input autocomplete="off"  class="form-control" name="date" placeholder="date: YYYY-MM-DD" type="text">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="time" placeholder="time: 24hr Format" type="text">
+        </div>
+         <div class="form-group">
+            <input class="form-control" name="long" placeholder="Longitude" type="text">
+        </div>
+         <div class="form-group">
+            <input class="form-control" name="lat" placeholder="Latitude" type="text">
+        </div>
+
+        <button class="btn btn-primary" type="submit">ADD</button>
+    </form>
     </div>
   </div>
 </div>

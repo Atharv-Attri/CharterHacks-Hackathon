@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Chat
+{% endblock %}
+
+{% block main %} 
+    
+    <form action="/chatdel" method="post">
+        <button class="btn btn-primary" type="submit">DELETE CHAT</button>
+    </form>
+    {% for i in chatdata %}
+        {% if i["sender"] == p0 %}
+            <h3 style="padding-left: 60%">{{ i["text"] }}</h3>
+        {% else %}
+            <h3 style="padding-right: 60%">{{ i["text"] }}</h3>
+        {% endif %}
+    {% endfor %}
+    <form id="form"action="/chatadd" method="post">
+        <div class="form-group">
+            <input autofocus class="form-control" name="text" placeholder="text" type="text">
+        </div>
+        
+        <button class="btn btn-primary" type="submit">SEND</button>
+        <button class="btn btn-primary" type="submit">refresh</button>
+    </form>
+{% endblock %}
+<!-- Login Page -->

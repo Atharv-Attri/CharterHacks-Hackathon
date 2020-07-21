@@ -2,18 +2,22 @@
 import os
 
 from datetime import datetime
+
 from SQL import SQL
+
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
+
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
+
 import datetime, time
+
 from helpers import apology, login_required
 
 # Configure application
 app = Flask(__name__)
-
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -37,7 +41,6 @@ Session(app)
 db = SQL("sqlite:///NOTME.db")
 
 
-
 @app.route("/")
 def index():
     # if session is not set, return index, else send to dashboard
@@ -51,8 +54,8 @@ def index():
 def data ():
     # check for infection
     infected(session["user_id"])
-    posd = db.execute("SELECT pos FROM users WHERE id = ?", session["user_id"])
-    if posd[0]["pos"] == 0:
+    usrpos = db.execute("SELECT pos FROM users WHERE id = ?", session["user_id"])
+    if usrpos[0]["pos"] == 0:
         POSITIVE = False
     else:
         POSITIVE = True
@@ -69,7 +72,7 @@ def data ():
         coordinates = i["lat"], i["long"]
         parsed.append([lat, lng, date, times])
     # return the template
-    return render_template("data.html", locations=parsed, positive=POSITIVE )
+    return render_template("data.html", locations=parsed, positive=POSITIVE, id=session["user_id"] )
 
 
 @app.route("/positive", methods=["POST"])
@@ -129,7 +132,61 @@ def logout():
 @login_required
 def faq():
     return render_template("faq.html")
-    
+
+
+@app.route("/chat", methods=["GET", "POST"])
+@login_required
+def chat():
+    if request.method == "POST":
+        # p as in person
+        session["p0id"] = session["user_id"]
+        session["p1id"] = int(request.form.get("id"))
+        session["P1"] = session["p1id"]
+        session["chatdata"] = db.execute("SELECT * FROM chat WHERE person0=:p0 AND person1=:p1 OR person1=:p0 AND person0=:p1", p0=session["p0id"], p1=session["P1"])
+    return render_template("chat.html", chatdata=session["chatdata"], p0=session["user_id"])
+
+
+@app.route("/chatadd", methods=["POST"])
+@login_required
+def chatadd():
+    session["text"] = request.form.get("text")
+    db.execute("INSERT INTO chat (person0, person1, text, sender) Values (?, ?, ?, ?);", session["user_id"], session["P1"], session["text"],  session["user_id"])
+    session["chatdata"] = db.execute("SELECT * FROM chat WHERE person0=:p0 AND person1=:p1 OR person1=:p0 AND person0=:p1", p0=session["user_id"], p1=session["P1"])
+    return redirect("/chat")
+
+
+@app.route("/chatdel", methods=["POST"])
+@login_required
+def chatdel():
+    db.execute("DELETE FROM chat WHERE person0=:p0 AND person1=:p1 OR person1=:p0 AND person0=:p1;", p0=session["user_id"], p1=session["P1"])
+    return redirect("/chat")
+
+
+@app.route("/locationAdd", methods=["POST"])
+@login_required
+def locadd():
+    date = request.form.get("date")
+    timein = request.form.get("time")
+    lat = request.form.get("lat")
+    lng = request.form.get("long")
+    timedate = date + " " + timein
+    usrpref = db.execute("SELECT * FROM pref WHERE id=?", session["user_id"])
+    for i in usrpref:
+        if usrpref[0]["lat"] + 0.003 > float(lat) > usrpref[0]["lat"] - 0.003 or usrpref[0]["long"] + 0.003 > float(lng) > usrpref[0]["long"] - 0.003:
+            return redirect("/")
+    db.execute("INSERT INTO location (id, lat, long, timedate) Values (:id, :lat, :lng, :td)", id=session["user_id"], lat=lat, lng=lng, td=timedate)
+    return redirect("/")
+
+
+@app.route("/notTrack", methods=["GET","POST"])
+@login_required
+def notTrack():
+    lat = request.form.get("lat")
+    lng = request.form.get("long")
+    if not lat or not lng:
+        return apology("NO LAT OR LONG")
+    db.execute("INSERT INTO pref (id, lat, long) Values (:id, :lat, :lng)", id=session["user_id"], lat=lat, lng=lng)
+    return redirect("/")
 
 
 @app.route("/delete", methods=["GET", "POST"])
@@ -183,9 +240,7 @@ def infected(id):
                         db.execute("UPDATE users SET pos=1 WHERE id = ?", id)
             except:
                 pass
-    return
-
-
+    return redirect("/")
 
 
 def errorhandler(e):
